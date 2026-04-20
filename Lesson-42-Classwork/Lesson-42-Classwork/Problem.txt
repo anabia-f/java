@@ -1,0 +1,7 @@
+
+PROBLEMS:
+
+1 -Add the course “MCLUB1” with a section 3 during period 1, teacher1 is “WHOKNOWS”, room is “ROOFTOP” for STUDENT2.
+
+2- For student with an id “STUDENT4”, add course “CN100” with a section 1, teacher “PORCHETTA”, period 2 and room 108
+

@@ -1,0 +1,15 @@
+REMINDER - You will need to compile and run the program by typing in the commands in the console
+
+Compiling:
+javac -cp sqlite-jdbc-3.23.1.jar: Main.java
+
+Running:
+java -cp sqlite-jdbc-3.23.1.jar: Main
+
+PROBLEMS:
+1- change Mr. Porchetta’s 10th period room to 323
+
+2- remove remove Mr Castro (“CASTRO R”) 2nd period class
+
+
+

@@ -1,0 +1,15 @@
+Using the chinook database to write the SQL statements that produces the list asked (using the diagram to assist you on which tables contain the information and their relationships):
+
+Problem 1:
+List the first 20 album titles with the artist name who produced the album.
+
+Problem 2:
+List the first 20 the song(tracks) names that are genre of: Blues, Latin, Pop, Classical.
+
+Problem 3:
+List the first 20 song(track) names that are in the playlist Grunge. 
+
+
+
+
+

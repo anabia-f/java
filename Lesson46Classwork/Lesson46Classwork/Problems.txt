@@ -1,0 +1,5 @@
+Problem 1
+Create a default route that sends a string that has with your name and stating this is your default route.
+
+Problem 2
+Create a route called myWebPage that servers(sends) a webpage stored in the file index.html.  You will need to read the file into a string and then send it.
