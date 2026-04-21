@@ -1,7 +1,7 @@
 
 let data,songs;
-function init(){
-  let link = "https://ideal-winner-9759vx4gx6grhwqr.github.dev/";
+async function init(){
+  let link = "https://ideal-winner-9759vx4gx6grhwqr-8500.app.github.dev";
   let route = "/songs";
   info = await fetch(link+route);
   songs = await info.json();
@@ -9,7 +9,6 @@ function init(){
 
   generateCards(songs);
 
-  $.ajaxSetup({async: false});
   
  
 }

@@ -41,9 +41,8 @@ class Main {
     server.createContext("/", new RouteHandler("You are connected, but route not given or incorrect....") );
 
     String sql = "";
-    sql = "Select tracks.Name, tracks.Composer, albums.Title FROM tracks";
+    sql = "Select tracks.Name, tracks.Composer, albums.Title FROM tracks ";
     sql += "INNER JOIN albums ON albums.albumid = tracks.albumid";
-    sql += "LIMIT 100";
     server.createContext("/songs", new RouteHandler(db, sql));
 
   
