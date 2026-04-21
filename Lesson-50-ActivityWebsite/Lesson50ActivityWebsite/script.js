@@ -23,9 +23,9 @@ function generateCards(songs){
     build += `<h3>Song Name</h3>`;
     build += `<p>${song.Name}</p>`;
     build += `<div>Album</div>`;
-    build += `<h2>${song.Title}</h2>`;
+    build += `<h3>${song.Title}</h3>`;
     build += `<div>Composer</div>`;
-    build += `<h2>${song.Composer}</h2>`;
+    build += `<h3>${song.Composer}</h3>`;
     build += `<hr>`;
     build += `</div>`;
   }
