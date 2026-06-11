@@ -3,28 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sweet Crumbs Bakery</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <title>ButterVeil Bakery</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-  <h1>Sweet Crumbs Bakery</h1>
+  <h1>ButterVeil Bakery</h1>
   <p>Freshly baked, made with love</p>
 </header>
 
 <div class="controls">
   <div class="search-wrap">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-    </svg>
     <input type="text" id="searchInput" placeholder="Search desserts…" />
   </div>
   <div class="filters">
     <button class="filter-btn active" data-route="/api/desserts">All</button>
-    <button class="filter-btn gf"     data-route="/api/desserts/gluten-free">🌾 Gluten-Free</button>
-    <button class="filter-btn lf"     data-route="/api/desserts/low-fat">🥗 Low Fat</button>
+    <button class="filter-btn gf"     data-route="/api/desserts/gluten-free">Gluten-Free</button>
+    <button class="filter-btn lf"     data-route="/api/desserts/low-fat">Low Fat</button>
   </div>
 </div>
 
@@ -32,48 +28,29 @@
 <div class="grid"  id="grid"></div>
 
 <script>
-  const EMOJIS = {
+  var EMOJIS = {
     Cake:"🎂", Pastry:"🥐", Muffin:"🧁", Cupcake:"🧁", Tart:"🥧",
     Cheesecake:"🍰", Bread:"🍞", Brownie:"🍫", Donut:"🍩", Macaroon:"🍪",
     Cookie:"🍪", "Dessert Cup":"🍮", "Bar Dessert":"🍫", Scone:"🥐"
   };
 
-  const grid        = document.getElementById("grid");
+  var grid = document.getElementById("grid");
   var searchInput = document.getElementById("searchInput");
   var countLabel  = document.getElementById("countLabel");
   var filterBtns  = document.querySelectorAll(".filter-btn");
-
-  // This array will hold all the desserts we get back from the server
   var allDesserts = [];
-
-  // This is the current URL route we are fetching from
   var currentRoute = "/api/desserts";
-
-  // This function goes to the server and gets dessert data
   function fetchDesserts(route) {
-    grid.innerHTML = '<div class="status"><span>⏳</span>Loading…</div>';
-
     var request = new XMLHttpRequest();
     request.open("GET", route);
-
     request.onload = function() {
       allDesserts = JSON.parse(request.responseText);
       renderCards();
     };
-
-    request.onerror = function() {
-      grid.innerHTML = '<div class="status"><span>❌</span>Could not connect to the server. Make sure server.js is running.</div>';
-      countLabel.textContent = "";
-    };
-
     request.send();
   }
-
-  // This function builds and displays the cards on the page
   function renderCards() {
     var searchWord = searchInput.value.toLowerCase();
-
-    // Loop through desserts and keep only ones that match the search
     var filtered = [];
     for (var i = 0; i < allDesserts.length; i++) {
       var d = allDesserts[i];
@@ -84,95 +61,53 @@
         filtered.push(d);
       }
     }
-
     countLabel.textContent = filtered.length + " items found";
     grid.innerHTML = "";
-
-    if (filtered.length === 0) {
-      grid.innerHTML = '<div class="status"><span>🍰</span>No desserts match your search.</div>';
-      return;
-    }
-
-    // Loop through filtered desserts and create a card for each one
     for (var i = 0; i < filtered.length; i++) {
       var d = filtered[i];
-
-      // Pick an emoji based on category
       var emoji = EMOJIS[d.category];
       if (!emoji) { emoji = "🍬"; }
 
-      // Figure out the badge HTML for gluten-free and low fat
-      var gfBadge = "";
-      var lfBadge = "";
-      if (d.gluten_free) { gfBadge = '<span class="badge badge-gf">Gluten-Free</span>'; }
-      if (d.low_fat)     { lfBadge = '<span class="badge badge-lf">Low Fat</span>'; }
-
-      // Figure out yes/no text for the back of the card
-      var gfText = "❌ No";
-      var lfText = "❌ No";
-      if (d.gluten_free) { gfText = "✅ Yes"; }
-      if (d.low_fat)     { lfText = "✅ Yes"; }
-
-      // Format the price to 2 decimal places
+      var gfText = "No";
+      var lfText = "No";
+      if (d.gluten_free) {gfText = "Yes";}
+      if (d.low_fat) {lfText = "Yes";}
       var price = Number(d.price).toFixed(2);
 
-      // Create the card element
       var wrap = document.createElement("div");
       wrap.className = "card-wrap";
       wrap.innerHTML =
-        '<div class="card-inner">' +
-          '<div class="card-front">' +
-            '<div class="card-img">' + emoji + '</div>' +
-            '<div class="card-front-body">' +
-              '<div>' +
-                '<div class="card-name">' + d.name + '</div>' +
-                '<div class="card-category">' + d.category + '</div>' +
-              '</div>' +
-              '<div>' +
-                '<div class="card-price">$' + price + '</div>' +
-                '<div class="card-badges">' + gfBadge + lfBadge + '</div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="hint">hover to flip</div>' +
-          '</div>' +
-          '<div class="card-back">' +
-            '<div class="back-name">' + d.name + '</div>' +
-            '<div class="back-row"><span>Flavor</span><span>' + d.flavor + '</span></div>' +
-            '<div class="back-row"><span>Category</span><span>' + d.category + '</span></div>' +
-            '<div class="back-row"><span>Price</span><span>$' + price + '</span></div>' +
-            '<div class="back-row"><span>Gluten-Free</span><span>' + gfText + '</span></div>' +
-            '<div class="back-row"><span>Low Fat</span><span>' + lfText + '</span></div>' +
-          '</div>' +
+        '<div class="card-inner">' 
+        '<div class="card-front">' 
+        '<div class="card-img">' + emoji + '</div>' +
+        '<div class="card-front-body">' +
+        '<div>' +
+      '<div class="card-name">' + d.name + '</div>' +
+        '<div class="card-category">' + d.category + '</div>' +
+        '</div>' + '<div>' +
+        '<div class="card-price">$' + price + '</div>' +
+        '<div class="card-badges">' + gfBadge + lfBadge + '</div>' +
+        '</div>' 
+        '</div>' 
+        '<div class="hint">hover to flip</div>' 
+        '</div>' 
+        '<div class="card-back">' 
+        '<div class="back-name">' + d.name + '</div>' +
+         '<div class="back-row"><span>Flavor</span><span>' + d.flavor + '</span></div>' +
+         '<div class="back-row"><span>Category</span><span>' +d.category + '</span></div>' +
+          '<div class="back-row"><span>Price</span><span>$'+price+ '</span></div>' +
+          '<div class="back-row"><span>Gluten-Free</span><span>' + gfText + '</span></div>' +
+          '<div class="back-row"><span>Low Fat</span><span>' + lfText + '</span></div>' +
+          '</div>' 
         '</div>';
 
-      // Clicking a card flips it
       wrap.addEventListener("click", function() {
         this.classList.toggle("flipped");
       });
-
-      grid.appendChild(wrap);
     }
   }
-
-  // When a filter button is clicked, fetch from that route
-  for (var i = 0; i < filterBtns.length; i++) {
-    filterBtns[i].addEventListener("click", function() {
-      // Remove "active" from all buttons
-      for (var j = 0; j < filterBtns.length; j++) {
-        filterBtns[j].classList.remove("active");
-      }
-      // Add "active" to the one that was clicked
-      this.classList.add("active");
-      currentRoute = this.dataset.route;
-      searchInput.value = "";
-      fetchDesserts(currentRoute);
-    });
-  }
-
-  // When the user types in the search bar, re-render the cards
   searchInput.addEventListener("input", renderCards);
 
-  // Load all desserts when the page first opens
   fetchDesserts(currentRoute);
 </script>
 </body>
