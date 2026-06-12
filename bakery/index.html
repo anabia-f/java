@@ -2,113 +2,42 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ButterVeil Bakery</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<header>
-  <h1>ButterVeil Bakery</h1>
-  <p>Freshly baked, made with love</p>
-</header>
+  <header>
+    <h1>ButterVeil Bakery</h1>
+    <p class="tagline">Made with love, freshly baked every morning</p>
+  </header>
 
-<div class="controls">
-  <div class="search-wrap">
-    <input type="text" id="searchInput" placeholder="Search desserts…" />
+  <div class="controls">
+    <input
+      type="text"
+      id="search-bar"
+      placeholder="Search desserts…"
+      aria-label="Search desserts"/>
+    <button class="filter-btn" id="btn-gluten-free" aria-pressed="false">
+      Gluten-Free
+    </button>
+    <button class="filter-btn" id="btn-low-fat" aria-pressed="false">
+      Low Fat
+    </button>
   </div>
-  <div class="filters">
-    <button class="filter-btn active" data-route="/api/desserts">All</button>
-    <button class="filter-btn gf"     data-route="/api/desserts/gluten-free">Gluten-Free</button>
-    <button class="filter-btn lf"     data-route="/api/desserts/low-fat">Low Fat</button>
-  </div>
-</div>
 
-<div class="count" id="countLabel"></div>
-<div class="grid"  id="grid"></div>
+  <main>
+    <div id="card-grid">
+      <p class="no-results">Loading desserts…</p>
+    </div>
+  </main>
 
-<script>
-  var EMOJIS = {
-    Cake:"🎂", Pastry:"🥐", Muffin:"🧁", Cupcake:"🧁", Tart:"🥧",
-    Cheesecake:"🍰", Bread:"🍞", Brownie:"🍫", Donut:"🍩", Macaroon:"🍪",
-    Cookie:"🍪", "Dessert Cup":"🍮", "Bar Dessert":"🍫", Scone:"🥐"
-  };
+  <footer>
+    <p>ButterVeil Bakery · Baked with butter & a little magic</p>
+  </footer>
+  <script src="database.js"></script>
+  <script src="main.js"></script>
 
-  var grid = document.getElementById("grid");
-  var searchInput = document.getElementById("searchInput");
-  var countLabel  = document.getElementById("countLabel");
-  var filterBtns  = document.querySelectorAll(".filter-btn");
-  var allDesserts = [];
-  var currentRoute = "/api/desserts";
-  function fetchDesserts(route) {
-    var request = new XMLHttpRequest();
-    request.open("GET", route);
-    request.onload = function() {
-      allDesserts = JSON.parse(request.responseText);
-      renderCards();
-    };
-    request.send();
-  }
-  function renderCards() {
-    var searchWord = searchInput.value.toLowerCase();
-    var filtered = [];
-    for (var i = 0; i < allDesserts.length; i++) {
-      var d = allDesserts[i];
-      if (searchWord === "" ||
-          d.name.toLowerCase().includes(searchWord) ||
-          d.flavor.toLowerCase().includes(searchWord) ||
-          d.category.toLowerCase().includes(searchWord)) {
-        filtered.push(d);
-      }
-    }
-    countLabel.textContent = filtered.length + " items found";
-    grid.innerHTML = "";
-    for (var i = 0; i < filtered.length; i++) {
-      var d = filtered[i];
-      var emoji = EMOJIS[d.category];
-      if (!emoji) { emoji = "🍬"; }
-
-      var gfText = "No";
-      var lfText = "No";
-      if (d.gluten_free) {gfText = "Yes";}
-      if (d.low_fat) {lfText = "Yes";}
-      var price = Number(d.price).toFixed(2);
-
-      var wrap = document.createElement("div");
-      wrap.className = "card-wrap";
-      wrap.innerHTML =
-        '<div class="card-inner">' 
-        '<div class="card-front">' 
-        '<div class="card-img">' + emoji + '</div>' +
-        '<div class="card-front-body">' +
-        '<div>' +
-      '<div class="card-name">' + d.name + '</div>' +
-        '<div class="card-category">' + d.category + '</div>' +
-        '</div>' + '<div>' +
-        '<div class="card-price">$' + price + '</div>' +
-        '<div class="card-badges">' + gfBadge + lfBadge + '</div>' +
-        '</div>' 
-        '</div>' 
-        '<div class="hint">hover to flip</div>' 
-        '</div>' 
-        '<div class="card-back">' 
-        '<div class="back-name">' + d.name + '</div>' +
-         '<div class="back-row"><span>Flavor</span><span>' + d.flavor + '</span></div>' +
-         '<div class="back-row"><span>Category</span><span>' +d.category + '</span></div>' +
-          '<div class="back-row"><span>Price</span><span>$'+price+ '</span></div>' +
-          '<div class="back-row"><span>Gluten-Free</span><span>' + gfText + '</span></div>' +
-          '<div class="back-row"><span>Low Fat</span><span>' + lfText + '</span></div>' +
-          '</div>' 
-        '</div>';
-
-      wrap.addEventListener("click", function() {
-        this.classList.toggle("flipped");
-      });
-    }
-  }
-  searchInput.addEventListener("input", renderCards);
-
-  fetchDesserts(currentRoute);
-</script>
 </body>
 </html>

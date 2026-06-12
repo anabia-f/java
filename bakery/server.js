@@ -1,60 +1,70 @@
-var express = require("express");
-var sqlite3 = require("sqlite3").verbose();
-var path = require("path");
-var app = express();
-var PORT = 3000;
-const db = new sqlite3.Database("./database/bakery.db");
+const http = require("http");
+const url = require("url");
+const desserts = require("./database.js");
 
-app.use(express.static(path.join(__dirname, "public")));
+const PORT = 3000;
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+function sendJSON(res, data){
+  res.writeHead(200, {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*"  
+  });
+  res.end(JSON.stringify(data));
+}
+
+const server = http.createServer(function(req, res){
+  const parsedUrl = url.parse(req.url, true);
+  const pathname = parsedUrl.pathname;
+  const query = parsedUrl.query;
+
+  if (pathname === "/desserts" && req.method === "GET"){
+    let results = desserts;
+
+    if (query.search) {
+      const term = query.search.toLowerCase();
+      results = results.filter(function (item) {
+        return (
+          item.name.toLowerCase().includes(term) ||
+          item.flavor.toLowerCase().includes(term) ||
+          item.category.toLowerCase().includes(term)
+        );
+      });
+    }
+
+    if (query.glutenFree === "true") {
+      results = results.filter(function (item) {
+        return item.glutenFree === true;
+      });
+    }
+
+    if (query.lowFat === "true") {
+      results = results.filter(function (item) {
+        return item.lowFat === true;
+      });
+    }
+
+    sendJSON(res, results);
+
+  } else if(pathname.startsWith("/desserts/") && req.method === "GET"){
+    const id = parseInt(pathname.split("/")[2]);
+    const dessert = desserts.find(function (item) {
+      return item.id === id;
+    });
+
+    if (dessert){
+      sendJSON(res, dessert);
+    } else{
+      res.writeHead(404, {"Content-Type": "application/json"});
+      res.end(JSON.stringify({error: "Dessert not found"}));
+    }
+
+  } else{
+    res.writeHead(404, {"Content-Type": "application/json"});
+    res.end(JSON.stringify({error: "Route not found"}));
+  }
 });
 
-app.get("/api/desserts", (req, res) => {
-  var sql = `
-    SELECT desserts.id, desserts.name, desserts.flavor, desserts.price,
-           desserts.gluten_free, desserts.low_fat, categories.name AS category
-    FROM desserts
-    INNER JOIN categories ON desserts.category_id = categories.id
-    ORDER BY desserts.name
-  `;
-  db.all(sql, [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
-  });
-;
-
-app.get("/api/desserts/gluten-free", (req, res) => {
-  const sql = `
-    SELECT desserts.id, desserts.name, desserts.flavor, desserts.price,
-           desserts.gluten_free, desserts.low_fat, categories.name AS category
-    FROM desserts
-    INNER JOIN categories ON desserts.category_id = categories.id
-    WHERE desserts.gluten_free = 1
-    ORDER BY desserts.name
-  `;
-  db.all(sql, [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
-  });
+server.listen(PORT, function(){
+  console.log("ButterVeil Bakery server is running at http://localhost:" + PORT);
+  console.log("Try visiting: http://localhost:" + PORT + "/desserts");
 });
-
-app.get("/api/desserts/low-fat", (req, res) => {
-  const sql = `
-    SELECT desserts.id, desserts.name, desserts.flavor, desserts.price,
-           desserts.gluten_free, desserts.low_fat, categories.name AS category
-    FROM desserts
-    INNER JOIN categories ON desserts.category_id = categories.id
-    WHERE desserts.low_fat = 1
-    ORDER BY desserts.name
-  `;
-  db.all(sql, [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
-  });
-});
-
-app.get("/api/categories"), (req, res) => {
-  db.all("SELECT * FROM categories ORDER BY name", );
-};})
