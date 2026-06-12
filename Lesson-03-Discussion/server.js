@@ -1,7 +1,6 @@
-const http = require("http");
-const url = require("url");
-const desserts = require("./database.js");
-
+var http = require("http");
+var url = require("url");
+var desserts = require("../bakery/database.js");
 const PORT = 3000;
 
 function sendJSON(res, data){

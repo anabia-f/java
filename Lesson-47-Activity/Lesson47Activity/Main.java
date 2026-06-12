@@ -35,19 +35,33 @@ class Main {
 
     // create the database object
     Database db = new Database("jdbc:sqlite:chinook.db");
-    
-    
+    // Add your  code here
+    server.createContext("/", new RouteHandler("You are connected, but route not given or incorrect....") );
 
-   // Add your  code here
-  
+    sql  = " Select customers.customerId, customers.firstname, customers.lastname, customers.phone from Customers ";
+    server.createContext("/customers", new RouteHandler(db,sql) ) ;
+
+    sql  = " Select * from employees ";
+    sql += " LIMIT 15 ";
+    server.createContext("/employees", new RouteHandler(db,sql) ) ;
+
+    sql  = " Select * From tracks ";
+    sql += " Inner Join albums ON albums.albumid=tracks.albumid ";
+    sql += " Inner Join artists ON albums.artistid=artists.artistid ";
+    sql += " LIMIT 15 ";
+    server.createContext("/albumsinfo", new RouteHandler(db,sql) );
+
+    sql  = " Select customers.firstname, customers.lastname, tracks.name, invoices.invoicedate From tracks ";
+    sql += " Inner Join invoice_items ON invoice_items.trackid=tracks.trackid ";
+    sql += " Inner Join invoices ON invoices.invoiceid=invoice_items.invoiceid ";
+    sql += " Inner Join customers ON invoices.customerid=customers.customerid ";
+    sql += " LIMIT 15 ";
+    server.createContext("/customersongs", new RouteHandler(db,sql) );
 
     //Start the server
     server.start();
-
     System.out.println("Server is listening on port "+port);
        
       
     }    
 }
-
-
